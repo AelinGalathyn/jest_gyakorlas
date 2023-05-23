@@ -1,169 +1,110 @@
 const Eloadas = require('./eloadas');
 
+beforeEach(() => {
+    eloadas = new Eloadas(3, 4);
+})
+
 test('készít egy üres előadást', () => {
-    expect(() => new Eloadas(4, 5).not.toThrow());
+    expect(() => eloadas).not.toThrow();
 });
 
 test('rossz bemenetet dob vissza - sor', () => {
-    expect(() => new Eloadas(0, 5).toThrow());
+    expect(() => new Eloadas(0, 5)).toThrow();
 });
 
 test('rossz bemenetet dob vissza - hely', () => {
-    expect(() => new Eloadas(5, 0).toThrow());
+    expect(() => new Eloadas(5, 0)).toThrow();
 });
 
 test('rossz bemenetet dob vissza - mindkettő', () => {
-    expect(() => new Eloadas(0, 0).toThrow());
+    expect(() => new Eloadas(0, 0)).toThrow();
 });
 
 test('létrehoz egy nem null tömböt', () => {
-    expect(() => new Eloadas(3, 5).not.toEqualNull());
+    expect(eloadas).not.toBeNull();
 });
 
-test('megfelelő méretű tömböt készít - sor ellenőrzés', () => {
-    expect(() => new Eloadas(3, 5).foglalasok.length.toEqual(3));
-});
-
-test('megfelelő méretű tömböt készít - hely ellenőrzés', () => {
-    expect(() => new Eloadas(3, 5).foglalasok.length[0].toEqual(5));
-});
-
-test('létrehozás után minden hely szabad', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 5);
-        for (let i = 0; i < eloadas.length; i++) {
-            for (let j = 0; j < eloadas[i].length; j++) {
-                if (eloadas[i][j]) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }).toBeTruthy();
+test('megfelelő méretű tömböt készít', () => {
+    expect(eloadas.getSzabadhelyek()).toEqual(12);
 });
 
 test('lefoglalás sikeres', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 5);
-        return eloadas.lefoglal;
-    }).toBeTruthy();
+    expect(eloadas.lefoglal()).toEqual(true);
 });
 
 test('lefoglalás sikertelen', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        for (let i = 0; i < eloadas.foglalasok.length * eloadas.foglalasok[i].length; i++) {
-            eloadas.lefoglal();
-        }
-        return eloadas.lefoglal;
-    }).toBeFalsy();
+    const size = eloadas.getSzabadhelyek();
+    for (let i = 0; i <= size; i++) {
+        eloadas.lefoglal();
+    }
+    expect(eloadas.lefoglal()).toEqual(false);
 });
 
 test('foglaláskor az első helyet foglalja le', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        eloadas.lefoglal();
-        return eloadas[0, 0];
-    }).toBeTruthy();
+    eloadas.lefoglal();
+    expect(eloadas.foglalt(1, 1)).toEqual(true);
 });
 
 test('minden hely szabad', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        return eloadas.getSzabadhelyek();
-    }).toEqual(9);
+    expect(eloadas.getSzabadhelyek()).toEqual(12);
 });
 
 test('nincs szabad hely', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        for (let i = 0; i < eloadas.foglalasok.length * eloadas.foglalasok[i].length; i++) {
-            eloadas.lefoglal();
-        }
-        return eloadas.getSzabadhelyek();
-    }).toEqual(0);
+    const helyek = eloadas.getSzabadhelyek();
+    for (let i = 0; i < helyek; i++) {
+        eloadas.lefoglal();
+    }
+    expect(eloadas.getSzabadhelyek()).toEqual(0);
 });
 
 test('van szabad hely', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        eloadas.lefoglal();
-        eloadas.getSzabadhely().not.toEqual(0);
-    });
+    eloadas.lefoglal();
+    expect(eloadas.getSzabadhelyek()).not.toEqual(0);
 });
 
 test('teli van', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        for (let i = 0; i < eloadas.foglalasok.length * eloadas.foglalasok[i].length; i++) {
-            eloadas.lefoglal();
-        }
-        eloadas.getTeli().toBeTruthy();
-    });
+    const helyek = eloadas.getSzabadhelyek();
+    for (let i = 0; i < helyek; i++) {
+        eloadas.lefoglal();
+    }
+    expect(eloadas.getTeli()).toEqual(true);
 });
 
 test('nincs teli', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        eloadas.lefoglal();
-        eloadas.getTeli().toBeFalsy();
-    });
+    eloadas.lefoglal();
+    expect(eloadas.getTeli()).toEqual(false);
 });
 
 test('az ellenőrzött hely foglalt', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        eloadas.lefoglal();
-        eloadas.foglalt(1, 1).toBeTruthy();
-    });
+    eloadas.lefoglal();
+    expect(eloadas.foglalt(1, 1)).toEqual(true);
 });
 
 test('az ellenőrzött hely nem foglalt', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        eloadas.lefoglal();
-        eloadas.foglalt(1, 2).toBeFalsy();
-    });
+    eloadas.lefoglal();
+    expect(eloadas.foglalt(1, 2)).toEqual(false);
 });
 
 test('helytelen foglalás ellenőrzés - sor(min)', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        eloadas.foglalt(0, 1).toThrow();
-    });
+    expect(() => eloadas.foglalt(0, 1)).toThrow();
 });
 
 test('helytelen foglalás ellenőrzés - hely(min)', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        eloadas.foglalt(1, 0).toThrow();
-    });
+    expect(() => eloadas.foglalt(1, 0)).toThrow();
 });
 
 test('helytelen foglalás ellenőrzés - mindkettő(min)', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        eloadas.foglalt(0, 0).toThrow();
-    });
+    expect(() => eloadas.foglalt(0, 0)).toThrow();
 });
 
 test('helytelen foglalás ellenőrzés - sor(max)', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        return eloadas.foglalt(5, 3);
-    }).not.toThrow();
+    expect(() => eloadas.foglalt(5, 3)).toThrow();
 });
 
 test('helytelen foglalás ellenőrzés - hely(max)', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        eloadas.foglalt(3, 5).toThrow();
-    });
+    expect(() => eloadas.foglalt(5, 3)).toThrow();
 });
 
 test('helytelen foglalás ellenőrzés - mindkettő(max)', () => {
-    expect(() => {
-        const eloadas = new Eloadas(3, 3);
-        eloadas.foglalt(5, 5).toThrow();
-    });
+    expect(() => eloadas.foglalt(5, 5)).toThrow();
 });
